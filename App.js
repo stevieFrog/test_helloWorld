@@ -14,19 +14,35 @@ let fakeServerData = {
 		playlists: [
 			{
 				name: 'My favorites',
-				songs: ['Beat It', 'Push', 'Fake It']
+				songs: [
+					{name: 'Beat It', duration: 341},
+					{name: 'Push', duration: 784},
+					{name: 'Fake It', duration: 315}
+				]
 			},
 			{
 				name: 'Discover Weekly',
-				songs: ['Mario Bros','Luigi Sings','Zelda Raps']
+				songs: [
+					{name: 'Mario Bros', duration: 6400},
+					{name: 'Luigi Sings', duration: 187},
+					{name: 'Zelda Raps', duration: 140}
+				]
 			},
 			{
 				name: 'Zero',
-				songs: ['Mario Bros','Luigi Sings','Zelda Raps']
+				songs: [
+					{name: 'Mario Bros', duration: 240},
+					{name: 'Luigi Sings', duration: 187},
+					{name: 'Zelda Raps', duration: 140}
+				]
 			},
 			{
 				name: 'One',
-				songs: ['Mario Bros','Luigi Sings','Zelda Raps']
+				songs: [
+					{name: 'Mario Bros', duration: 240},
+					{name: 'Luigi Sings', duration: 187},
+					{name: 'Zelda Raps', duration: 140}
+				]
 			},
 		]
 	}
@@ -34,11 +50,29 @@ let fakeServerData = {
 }
 
 
-class Aggregate extends Component{
+class PlaylistCounter extends Component{
 	render() {
 		return(
 			<div style={{...defaultStyle, width: "40%", display: 'inline-block'}}>
-				<h2>Number and Text</h2>
+				<h2>{this.props.playlists && this.props.playlists.length} Playlists</h2>
+			</div>
+		);
+	}
+}
+
+class HoursCounter extends Component{
+	render() {
+		let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
+			return songs.concat(eachPlaylist.songs)
+		}, []);
+		let totalAllPlaylistsDuration = allSongs.reduce((sum , eachSong) => {
+			return sum + eachSong.duration
+		}, 0)
+		return(
+			<div style={{...defaultStyle, width: "40%", display: 'inline-block'}}>
+				<h2>
+					{Math.round(totalAllPlaylistsDuration/3600,2)} hours
+				</h2>
 			</div>
 		);
 	}
@@ -76,21 +110,28 @@ class App extends Component {
 		this.state = {serverData: {}}
 	};
   	componentDidMount(){
-		this.setState({serverData: fakeServerData});
+		setTimeout(() => {
+			this.setState({serverData: fakeServerData});
+			}
+		, 1500);
   	};
   render() {
     return (
-      <div className="App">
-		<h1 style={{...defaultStyle, 'font-size': '54px'}}>
-			{this.state.serverData.user && 
-			this.state.serverData.user.name}'s Playlist</h1>
-		<Aggregate/>
-		<Aggregate/>
-		<Filter/>
-		<Playlist/>
-		<Playlist/>
-		<Playlist/>
-		<Playlist/>
+		<div className="App">
+			{this.state.serverData.user ?	
+				<div>
+					<h1 style={{...defaultStyle, 'font-size': '54px'}}>
+						{this.state.serverData.user.name}'s Playlist
+					</h1>
+					<PlaylistCounter playlists={this.state.serverData.user.playlists}/>
+					<HoursCounter playlists={this.state.serverData.user.playlists}/>
+					<Filter/>
+					<Playlist/>
+					<Playlist/>
+					<Playlist/>
+					<Playlist/>
+				</div> : <h1 style={defaultStyle}>Loading....</h1>
+		}
       </div>
     );
   }
